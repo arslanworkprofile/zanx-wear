@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
-import { Search, Heart, ShoppingBag, User, Menu, X } from 'lucide-react';
+import { Search, Heart, ShoppingBag, User, Menu, X, LogOut, LogIn } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/store/cartStore';
 
@@ -21,6 +22,8 @@ export default function Navbar() {
   const { scrollY } = useScroll();
   const itemCount = useCartStore((s) => s.itemCount());
   const toggleCart = useCartStore((s) => s.toggleCart);
+  const { data: session, status } = useSession();
+  const isAuthed = status === 'authenticated';
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
     setScrolled(latest > 24);
@@ -137,6 +140,55 @@ export default function Navbar() {
                 </motion.li>
               ))}
             </ul>
+
+            <div className="container-fluid mt-8 flex flex-col gap-1">
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 * NAV_LINKS.length, duration: 0.4 }}
+              >
+                <Link
+                  href={isAuthed ? '/account' : '/login'}
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-3 py-3 font-body text-base text-ash-light transition-colors hover:text-fog"
+                >
+                  {isAuthed ? <User size={18} strokeWidth={1.5} /> : <LogIn size={18} strokeWidth={1.5} />}
+                  {isAuthed ? (session?.user?.name ? `Hi, ${session.user.name}` : 'My Account') : 'Login'}
+                </Link>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 * (NAV_LINKS.length + 1), duration: 0.4 }}
+              >
+                <Link
+                  href="/account/wishlist"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-3 py-3 font-body text-base text-ash-light transition-colors hover:text-fog"
+                >
+                  <Heart size={18} strokeWidth={1.5} />
+                  Wishlist
+                </Link>
+              </motion.div>
+              {isAuthed && (
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 * (NAV_LINKS.length + 2), duration: 0.4 }}
+                >
+                  <button
+                    onClick={() => {
+                      setMobileOpen(false);
+                      signOut({ callbackUrl: '/' });
+                    }}
+                    className="flex w-full items-center gap-3 py-3 font-body text-base text-ash-light transition-colors hover:text-fog"
+                  >
+                    <LogOut size={18} strokeWidth={1.5} />
+                    Sign out
+                  </button>
+                </motion.div>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

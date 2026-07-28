@@ -3,6 +3,7 @@ import { Poppins, Outfit } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'sonner';
 import SiteChrome from '@/components/layout/SiteChrome';
+import AuthProvider from '@/components/providers/AuthProvider';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -43,7 +44,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${poppins.variable} ${outfit.variable}`}>
       <body className="bg-matte-black font-body text-fog antialiased selection:bg-silver selection:text-matte-black">
-        <SiteChrome>{children}</SiteChrome>
+        <AuthProvider>
+          <SiteChrome>{children}</SiteChrome>
+        </AuthProvider>
         <Toaster
           position="bottom-right"
           theme="dark"
