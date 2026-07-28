@@ -134,6 +134,21 @@ export async function getProductBySlugFromDB(slug: string): Promise<FullProduct 
   }
 }
 
+export async function getProductsByIds(ids: string[]): Promise<FullProduct[]> {
+  if (ids.length === 0) return [];
+  try {
+    await connectDB();
+    // Guard against invalid ObjectId strings (e.g. leftover mock-data ids)
+    // so Mongoose doesn't throw a CastError for the whole query.
+    const validIds = ids.filter((id) => /^[a-f\d]{24}$/i.test(id));
+    if (validIds.length === 0) return [];
+    const docs = await Product.find({ _id: { $in: validIds } }).populate('category').lean();
+    return docs.map(mapProduct);
+  } catch {
+    return [];
+  }
+}
+
 export async function hasAnyProducts(): Promise<boolean> {
   try {
     await connectDB();

@@ -69,7 +69,7 @@ export default function Navbar() {
             <IconButton label="Search">
               <Search size={19} strokeWidth={1.5} />
             </IconButton>
-            <IconButton label="Wishlist" href="/wishlist" className="hidden sm:inline-flex">
+            <IconButton label="Wishlist" href="/account/wishlist" className="hidden sm:inline-flex">
               <Heart size={19} strokeWidth={1.5} />
             </IconButton>
             <IconButton label="Account" href="/account" className="hidden sm:inline-flex">

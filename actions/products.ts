@@ -216,3 +216,27 @@ export async function deleteProduct(productId: string) {
   revalidatePath('/');
   revalidatePath('/shop');
 }
+
+/**
+ * Public action backing the wishlist page. The wishlist itself is stored
+ * client-side (zustand + localStorage, see store/wishlistStore.ts) — this
+ * just resolves whatever product ids are in it into real product data.
+ * Falls back to the placeholder catalog for any id that isn't a real DB
+ * product yet, so wishlist items added while the store still had mock
+ * products don't just silently disappear.
+ */
+export async function getWishlistProducts(ids: string[]) {
+  if (ids.length === 0) return [];
+
+  const { getProductsByIds } = await import('@/lib/data/products');
+  const { ALL_PRODUCTS } = await import('@/lib/mock-data');
+
+  const realProducts = await getProductsByIds(ids);
+  const foundIds = new Set(realProducts.map((p) => p.id));
+  const missingIds = ids.filter((id) => !foundIds.has(id));
+  const mockMatches = ALL_PRODUCTS.filter((p) => missingIds.includes(p.id));
+
+  // Preserve the order products were added to the wishlist in.
+  const byId = new Map([...realProducts, ...mockMatches].map((p) => [p.id, p]));
+  return ids.map((id) => byId.get(id)).filter((p): p is NonNullable<typeof p> => !!p);
+}
