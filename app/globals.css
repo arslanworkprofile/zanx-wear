@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-line;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background: #c8cbd0;
+    color: #0b0b0c;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0b0b0c;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2a2a2d;
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a3a3e;
+  }
+  :focus-visible {
+    outline: 1.5px solid #c8cbd0;
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  .container-fluid {
+    @apply mx-auto w-full max-w-[1440px] px-6 md:px-10;
+  }
+
+  /* Glassmorphism panel used for floating product/feature cards */
+  .glass-panel {
+    background: linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.015));
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,0.09);
+  }
+
+  /* Hairline divider, the recurring structural device across the site */
+  .hairline {
+    background: linear-gradient(90deg, transparent, rgba(200,203,208,0.35), transparent);
+    height: 1px;
+  }
+
+  .eyebrow {
+    @apply font-body text-[11px] uppercase tracking-widest2 text-ash-light;
+  }
+
+  .btn-premium {
+    @apply relative inline-flex items-center justify-center overflow-hidden rounded-full px-8 py-3.5 font-body text-sm font-medium tracking-wide transition-colors duration-300;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .mask-fade-r {
+    mask-image: linear-gradient(90deg, black 80%, transparent 100%);
+  }
+}
