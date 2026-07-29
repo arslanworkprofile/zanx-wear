@@ -14,10 +14,14 @@ const STATUS_STYLES: Record<string, string> = {
   refunded: 'text-ash-dark',
 };
 
-async function getOrders(userId: string) {
+async function getOrders(userId: string, email?: string | null) {
   try {
     await connectDB();
-    return await Order.find({ user: userId }).sort({ createdAt: -1 }).lean();
+    // Matches by linked user id (new orders) as well as guest email (orders
+    // placed before accounts were linked, or if a customer checked out as a
+    // guest with the same email before creating an account).
+    const query = email ? { $or: [{ user: userId }, { guestEmail: email }] } : { user: userId };
+    return await Order.find(query).sort({ createdAt: -1 }).lean();
   } catch {
     return null;
   }
@@ -25,7 +29,9 @@ async function getOrders(userId: string) {
 
 export default async function OrdersPage() {
   const session = await auth();
-  const orders = session?.user?.id ? await getOrders(session.user.id) : null;
+  const orders = session?.user?.id
+    ? await getOrders(session.user.id, session.user.email)
+    : null;
 
   if (orders === null) {
     return (

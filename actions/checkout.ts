@@ -3,6 +3,7 @@
 import { z } from 'zod';
 import { connectDB } from '@/lib/mongodb';
 import Order from '@/models/Order';
+import { auth } from '@/lib/auth';
 import { createPaymentIntent, type PaymentProvider } from '@/lib/payments';
 
 const addressSchema = z.object({
@@ -58,6 +59,12 @@ export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> 
   }
   const data = parsed.data;
 
+  // If the customer is logged in, link the order to their account so it
+  // shows up under Account → Orders. Guests (no session) still get an order
+  // saved against just their email, same as before.
+  const session = await auth();
+  const userId = session?.user?.id;
+
   const subtotal = data.items.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const shippingFee = subtotal >= 100 ? 0 : 5;
   const discount = 0; // TODO: recompute against the Coupon collection server-side
@@ -77,6 +84,7 @@ export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> 
     await connectDB();
     await Order.create({
       orderNumber,
+      user: userId,
       guestEmail: data.email,
       items: data.items.map((i) => ({
         product: i.productId,
