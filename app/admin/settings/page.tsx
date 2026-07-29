@@ -10,8 +10,12 @@ async function getSettings() {
       const created = await Settings.create({});
       doc = created.toObject();
     }
+    const plain = JSON.parse(JSON.stringify(doc));
     return {
-      settings: JSON.parse(JSON.stringify(doc)),
+      settings: {
+        ...plain,
+        social: { instagram: '', facebook: '', twitter: '', tiktok: '', ...plain.social },
+      },
       connected: true,
     };
   } catch {
@@ -22,6 +26,7 @@ async function getSettings() {
         supportEmail: 'support@zanxwear.com',
         seo: { defaultTitle: '', defaultDescription: '' },
         shipping: { flatRate: 5, freeShippingThreshold: 100 },
+        social: { instagram: '', facebook: '', twitter: '', tiktok: '' },
       },
       connected: false,
     };

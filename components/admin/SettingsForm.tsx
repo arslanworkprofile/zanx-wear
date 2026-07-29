@@ -11,6 +11,7 @@ interface SettingsData {
   supportEmail: string;
   seo: { defaultTitle: string; defaultDescription: string };
   shipping: { flatRate: number; freeShippingThreshold: number };
+  social: { instagram?: string; facebook?: string; twitter?: string; tiktok?: string };
 }
 
 const initialState: SettingsFormState = { success: false };
@@ -77,6 +78,49 @@ export default function SettingsForm({ settings }: { settings: SettingsData }) {
             />
           </Field>
         </div>
+      </Section>
+
+      <Section title="Social Links">
+        <p className="-mt-2 mb-1 font-body text-xs text-ash-dark">
+          Leave a field blank to hide that icon on the website. Use full URLs (e.g.
+          https://instagram.com/yourbrand).
+        </p>
+        <Field label="Instagram URL">
+          <input
+            name="socialInstagram"
+            type="url"
+            placeholder="https://instagram.com/zanxwear"
+            defaultValue={settings.social?.instagram ?? ''}
+            className="input"
+          />
+        </Field>
+        <Field label="Facebook URL">
+          <input
+            name="socialFacebook"
+            type="url"
+            placeholder="https://facebook.com/zanxwear"
+            defaultValue={settings.social?.facebook ?? ''}
+            className="input"
+          />
+        </Field>
+        <Field label="Twitter / X URL">
+          <input
+            name="socialTwitter"
+            type="url"
+            placeholder="https://x.com/zanxwear"
+            defaultValue={settings.social?.twitter ?? ''}
+            className="input"
+          />
+        </Field>
+        <Field label="TikTok URL">
+          <input
+            name="socialTiktok"
+            type="url"
+            placeholder="https://tiktok.com/@zanxwear"
+            defaultValue={settings.social?.tiktok ?? ''}
+            className="input"
+          />
+        </Field>
       </Section>
 
       <SubmitButton />

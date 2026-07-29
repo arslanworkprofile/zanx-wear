@@ -31,9 +31,18 @@ export async function updateSettings(
       flatRate: Number(formData.get('flatRate') ?? 0),
       freeShippingThreshold: Number(formData.get('freeShippingThreshold') ?? 0),
     },
+    social: {
+      instagram: formData.get('socialInstagram')?.toString().trim() || '',
+      facebook: formData.get('socialFacebook')?.toString().trim() || '',
+      twitter: formData.get('socialTwitter')?.toString().trim() || '',
+      tiktok: formData.get('socialTiktok')?.toString().trim() || '',
+    },
   };
 
   await Settings.findOneAndUpdate({}, update, { upsert: true, new: true });
   revalidatePath('/admin/settings');
+  // Social links render on every public page via the footer, so bust the
+  // whole site's cache, not just the settings screen.
+  revalidatePath('/', 'layout');
   return { success: true };
 }

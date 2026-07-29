@@ -4,6 +4,7 @@ import './globals.css';
 import { Toaster } from 'sonner';
 import SiteChrome from '@/components/layout/SiteChrome';
 import AuthProvider from '@/components/providers/AuthProvider';
+import { getSocialLinks } from '@/lib/data/settings';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -40,12 +41,14 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const social = await getSocialLinks();
+
   return (
     <html lang="en" className={`${poppins.variable} ${outfit.variable}`}>
       <body className="bg-matte-black font-body text-fog antialiased selection:bg-silver selection:text-matte-black">
         <AuthProvider>
-          <SiteChrome>{children}</SiteChrome>
+          <SiteChrome social={social}>{children}</SiteChrome>
         </AuthProvider>
         <Toaster
           position="bottom-right"

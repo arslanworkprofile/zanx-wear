@@ -5,8 +5,15 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import CartDrawer from '@/components/layout/CartDrawer';
 import WhatsAppButton from '@/components/layout/WhatsAppButton';
+import type { SocialLinks } from '@/lib/data/settings';
 
-export default function SiteChrome({ children }: { children: React.ReactNode }) {
+export default function SiteChrome({
+  children,
+  social,
+}: {
+  children: React.ReactNode;
+  social: SocialLinks;
+}) {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith('/admin');
 
@@ -21,7 +28,7 @@ export default function SiteChrome({ children }: { children: React.ReactNode }) 
       <Navbar />
       <CartDrawer />
       <main>{children}</main>
-      <Footer />
+      <Footer social={social} />
       <WhatsAppButton />
     </>
   );

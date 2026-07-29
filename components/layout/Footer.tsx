@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Instagram, Twitter, Facebook } from 'lucide-react';
+import { Instagram, Twitter, Facebook, Music2 } from 'lucide-react';
+import type { SocialLinks } from '@/lib/data/settings';
 
 const COLUMNS = [
   {
@@ -32,7 +33,14 @@ const COLUMNS = [
   },
 ];
 
-export default function Footer() {
+export default function Footer({ social }: { social: SocialLinks }) {
+  const socialIcons = [
+    { key: 'instagram', href: social.instagram, Icon: Instagram, label: 'Instagram' },
+    { key: 'facebook', href: social.facebook, Icon: Facebook, label: 'Facebook' },
+    { key: 'twitter', href: social.twitter, Icon: Twitter, label: 'Twitter' },
+    { key: 'tiktok', href: social.tiktok, Icon: Music2, label: 'TikTok' },
+  ].filter((s) => s.href);
+
   return (
     <footer className="border-t border-line bg-matte-black">
       <div className="container-fluid py-16">
@@ -44,18 +52,22 @@ export default function Footer() {
             <p className="mt-4 max-w-xs font-body text-sm leading-relaxed text-ash-light">
               Modern clothing and accessories, engineered with restraint. Wear the standard.
             </p>
-            <div className="mt-6 flex gap-3">
-              {[Instagram, Twitter, Facebook].map((Icon, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  aria-label="Social link"
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-line text-ash-light transition-colors hover:border-silver/40 hover:text-fog"
-                >
-                  <Icon size={15} />
-                </a>
-              ))}
-            </div>
+            {socialIcons.length > 0 && (
+              <div className="mt-6 flex gap-3">
+                {socialIcons.map(({ key, href, Icon, label }) => (
+                  <a
+                    key={key}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-line text-ash-light transition-colors hover:border-silver/40 hover:text-fog"
+                  >
+                    <Icon size={15} />
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
           {COLUMNS.map((col) => (

@@ -17,6 +17,12 @@ export interface ISettings extends Document {
     flatRate: number;
     freeShippingThreshold: number;
   };
+  social: {
+    instagram?: string;
+    facebook?: string;
+    twitter?: string;
+    tiktok?: string;
+  };
   maintenanceMode: boolean;
 }
 
@@ -40,6 +46,12 @@ const SettingsSchema = new Schema<ISettings>(
     shipping: {
       flatRate: { type: Number, default: 5 },
       freeShippingThreshold: { type: Number, default: 100 },
+    },
+    social: {
+      instagram: { type: String, default: '' },
+      facebook: { type: String, default: '' },
+      twitter: { type: String, default: '' },
+      tiktok: { type: String, default: '' },
     },
     maintenanceMode: { type: Boolean, default: false },
   },
