@@ -117,22 +117,44 @@ export async function createProduct(
 
   const slug = `${slugify(data.name)}-${Date.now().toString(36)}`;
 
-  await Product.create({
-    name: data.name,
-    slug,
-    description: data.description,
-    category: data.category,
-    gender: data.gender,
-    price: data.price,
-    discountPrice: data.discountPrice || undefined,
-    tags: data.tags ? data.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
-    isFeatured: !!data.isFeatured,
-    isTrending: !!data.isTrending,
-    isNewArrival: !!data.isNewArrival,
-    isBestSeller: !!data.isBestSeller,
-    images,
-    variants,
-  });
+  try {
+    await Product.create({
+      name: data.name,
+      slug,
+      description: data.description,
+      category: data.category,
+      gender: data.gender,
+      price: data.price,
+      discountPrice: data.discountPrice || undefined,
+      tags: data.tags ? data.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
+      isFeatured: !!data.isFeatured,
+      isTrending: !!data.isTrending,
+      isNewArrival: !!data.isNewArrival,
+      isBestSeller: !!data.isBestSeller,
+      images,
+      variants,
+    });
+  } catch (err: any) {
+    console.error('createProduct failed:', err);
+    if (err?.code === 11000) {
+      const field = Object.keys(err.keyPattern ?? {})[0] ?? 'value';
+      return {
+        success: false,
+        error:
+          field.includes('sku')
+            ? 'One of the variant SKUs is already used by another product. Use a unique SKU per variant.'
+            : `That ${field} is already in use.`,
+      };
+    }
+    if (err?.name === 'CastError') {
+      return { success: false, error: 'Please select a valid category.' };
+    }
+    if (err?.name === 'ValidationError') {
+      const firstMessage = Object.values(err.errors ?? {})[0] as { message?: string } | undefined;
+      return { success: false, error: firstMessage?.message ?? 'Invalid product data.' };
+    }
+    return { success: false, error: 'Something went wrong while saving the product.' };
+  }
 
   revalidatePath('/admin/products');
   revalidatePath('/');
@@ -184,21 +206,47 @@ export async function updateProduct(
   const db = await safeConnectDB();
   if (!db.ok) return { success: false, error: db.error };
 
-  await Product.findByIdAndUpdate(productId, {
-    name: data.name,
-    description: data.description,
-    category: data.category,
-    gender: data.gender,
-    price: data.price,
-    discountPrice: data.discountPrice || undefined,
-    tags: data.tags ? data.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
-    isFeatured: !!data.isFeatured,
-    isTrending: !!data.isTrending,
-    isNewArrival: !!data.isNewArrival,
-    isBestSeller: !!data.isBestSeller,
-    images,
-    variants,
-  });
+  try {
+    await Product.findByIdAndUpdate(
+      productId,
+      {
+        name: data.name,
+        description: data.description,
+        category: data.category,
+        gender: data.gender,
+        price: data.price,
+        discountPrice: data.discountPrice || undefined,
+        tags: data.tags ? data.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
+        isFeatured: !!data.isFeatured,
+        isTrending: !!data.isTrending,
+        isNewArrival: !!data.isNewArrival,
+        isBestSeller: !!data.isBestSeller,
+        images,
+        variants,
+      },
+      { runValidators: true }
+    );
+  } catch (err: any) {
+    console.error('updateProduct failed:', err);
+    if (err?.code === 11000) {
+      const field = Object.keys(err.keyPattern ?? {})[0] ?? 'value';
+      return {
+        success: false,
+        error:
+          field.includes('sku')
+            ? 'One of the variant SKUs is already used by another product. Use a unique SKU per variant.'
+            : `That ${field} is already in use.`,
+      };
+    }
+    if (err?.name === 'CastError') {
+      return { success: false, error: 'Please select a valid category.' };
+    }
+    if (err?.name === 'ValidationError') {
+      const firstMessage = Object.values(err.errors ?? {})[0] as { message?: string } | undefined;
+      return { success: false, error: firstMessage?.message ?? 'Invalid product data.' };
+    }
+    return { success: false, error: 'Something went wrong while saving the product.' };
+  }
 
   revalidatePath('/admin/products');
   revalidatePath(`/admin/products/${productId}/edit`);
