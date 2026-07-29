@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
@@ -14,6 +15,8 @@ import {
   FileText,
   Settings,
   LogOut,
+  Menu,
+  X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -31,9 +34,23 @@ const LINKS = [
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
 
-  return (
-    <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-line bg-matte-900 px-5 py-8 md:flex">
+  // Close the drawer whenever the route changes (e.g. after tapping a link).
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  // Prevent the page behind the drawer from scrolling while it's open.
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [open]);
+
+  const sidebarContent = (
+    <>
       <Link href="/admin" className="mb-10 font-display text-lg font-bold tracking-widest2 text-fog">
         ZANX<span className="text-ash-light"> ADMIN</span>
       </Link>
@@ -63,6 +80,55 @@ export default function AdminSidebar() {
         <LogOut size={16} strokeWidth={1.5} />
         Logout
       </button>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile top bar with hamburger toggle — only shown below md */}
+      <div className="fixed inset-x-0 top-0 z-40 flex items-center justify-between border-b border-line bg-matte-900 px-5 py-4 md:hidden">
+        <Link href="/admin" className="font-display text-base font-bold tracking-widest2 text-fog">
+          ZANX<span className="text-ash-light"> ADMIN</span>
+        </Link>
+        <button
+          onClick={() => setOpen(true)}
+          aria-label="Open admin menu"
+          className="rounded-lg p-2 text-fog transition-colors hover:bg-white/5"
+        >
+          <Menu size={22} strokeWidth={1.5} />
+        </button>
+      </div>
+
+      {/* Backdrop, mobile only, shown while drawer is open */}
+      {open && (
+        <div
+          onClick={() => setOpen(false)}
+          className="fixed inset-0 z-40 bg-black/60 md:hidden"
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Mobile slide-in drawer */}
+      <aside
+        className={cn(
+          'fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-line bg-matte-900 px-5 py-8 transition-transform duration-300 ease-out md:hidden',
+          open ? 'translate-x-0' : '-translate-x-full'
+        )}
+      >
+        <button
+          onClick={() => setOpen(false)}
+          aria-label="Close admin menu"
+          className="absolute right-4 top-4 rounded-lg p-1.5 text-ash-light transition-colors hover:bg-white/5 hover:text-fog"
+        >
+          <X size={18} strokeWidth={1.5} />
+        </button>
+        {sidebarContent}
+      </aside>
+
+      {/* Static desktop sidebar — unchanged from before */}
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-line bg-matte-900 px-5 py-8 md:flex">
+        {sidebarContent}
+      </aside>
+    </>
   );
 }
