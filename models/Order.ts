@@ -3,6 +3,7 @@ import { Schema, model, models, Document, Types } from 'mongoose';
 export type OrderStatus =
   | 'pending'
   | 'processing'
+  | 'on-hold'
   | 'shipped'
   | 'delivered'
   | 'cancelled'
@@ -108,7 +109,7 @@ const OrderSchema = new Schema<IOrder>(
     },
     status: {
       type: String,
-      enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'],
+      enum: ['pending', 'processing', 'on-hold', 'shipped', 'delivered', 'cancelled', 'refunded'],
       default: 'pending',
     },
     trackingNumber: { type: String },
