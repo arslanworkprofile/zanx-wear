@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
@@ -18,9 +18,8 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/account';
+  const callbackUrl = searchParams.get('callbackUrl') || '/';
 
   const {
     register,
@@ -45,8 +44,12 @@ function LoginForm() {
     }
 
     toast.success('Welcome back.');
-    router.push(callbackUrl);
-    router.refresh();
+    // A full navigation (not router.push) guarantees the browser sends the
+    // just-set session cookie on the very next request, so the destination
+    // page's server-side auth() check sees you as logged in immediately.
+    // router.push can occasionally race ahead of the cookie being applied,
+    // which looked like "login doesn't redirect."
+    window.location.assign(callbackUrl);
   };
 
   return (
