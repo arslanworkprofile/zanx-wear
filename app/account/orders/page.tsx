@@ -4,6 +4,7 @@ import { connectDB } from '@/lib/mongodb';
 import Order from '@/models/Order';
 import { formatPrice } from '@/lib/utils';
 import { cn } from '@/lib/utils';
+import DeleteOrderButton from '@/components/account/DeleteOrderButton';
 
 const STATUS_STYLES: Record<string, string> = {
   pending: 'text-ash-light',
@@ -20,7 +21,8 @@ async function getOrders(userId: string, email?: string | null) {
     // Matches by linked user id (new orders) as well as guest email (orders
     // placed before accounts were linked, or if a customer checked out as a
     // guest with the same email before creating an account).
-    const query = email ? { $or: [{ user: userId }, { guestEmail: email }] } : { user: userId };
+    const ownerQuery = email ? { $or: [{ user: userId }, { guestEmail: email }] } : { user: userId };
+    const query = { ...ownerQuery, hiddenByCustomer: { $ne: true } };
     return await Order.find(query).sort({ createdAt: -1 }).lean();
   } catch {
     return null;
@@ -68,6 +70,7 @@ export default async function OrdersPage() {
               {order.status}
             </span>
             <p className="font-body text-sm text-fog">{formatPrice(order.total)}</p>
+            <DeleteOrderButton orderId={order._id.toString()} />
           </div>
         </div>
       ))}

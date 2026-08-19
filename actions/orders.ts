@@ -89,3 +89,40 @@ export async function updateOrderTracking(
     return { success: false, error: 'Unauthorized or something went wrong.' };
   }
 }
+
+/**
+ * Lets a customer remove an order from their own "My Orders" list. This is a
+ * soft delete (sets hiddenByCustomer) rather than a real database deletion —
+ * the order stays intact in the admin panel and database for your business
+ * records (accounting, dispute handling, sales history). Only the customer's
+ * own view is affected.
+ */
+export async function deleteOwnOrder(orderId: string): Promise<OrderActionResult> {
+  try {
+    const session = await auth();
+    if (!session?.user) return { success: false, error: 'You must be signed in.' };
+
+    const db = await safeConnectDB();
+    if (!db.ok) return { success: false, error: db.error };
+
+    const order = await Order.findById(orderId);
+    if (!order) return { success: false, error: 'Order not found.' };
+
+    const belongsToUser =
+      order.user?.toString() === session.user.id ||
+      (session.user.email && order.guestEmail === session.user.email);
+
+    if (!belongsToUser) {
+      return { success: false, error: 'You can only remove your own orders.' };
+    }
+
+    order.hiddenByCustomer = true;
+    await order.save();
+
+    revalidatePath('/account/orders');
+    return { success: true };
+  } catch (err) {
+    console.error('deleteOwnOrder failed:', err);
+    return { success: false, error: 'Something went wrong.' };
+  }
+}

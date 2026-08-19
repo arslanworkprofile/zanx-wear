@@ -52,6 +52,7 @@ export interface IOrder extends Document {
   };
   status: OrderStatus;
   trackingNumber?: string;
+  hiddenByCustomer?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -113,6 +114,7 @@ const OrderSchema = new Schema<IOrder>(
       default: 'pending',
     },
     trackingNumber: { type: String },
+    hiddenByCustomer: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
