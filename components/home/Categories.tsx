@@ -17,6 +17,7 @@ export default function Categories({ categories }: { categories?: PublicCategory
           slug: c.slug,
           href: `/shop?category=${c.slug}`,
           featured: i === 0 || i === 3,
+          bannerUrl: c.bannerUrl,
         }))
       : CATEGORIES;
 
@@ -49,12 +50,20 @@ export default function Categories({ categories }: { categories?: PublicCategory
             )}
           >
             <Link href={cat.href} className="block h-full w-full">
-              <div
-                className={cn(
-                  'absolute inset-0 bg-gradient-to-br transition-transform duration-700 group-hover:scale-105',
-                  GRADIENTS[i % GRADIENTS.length]
-                )}
-              />
+              {cat.bannerUrl ? (
+                <img
+                  src={cat.bannerUrl}
+                  alt={cat.name}
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+              ) : (
+                <div
+                  className={cn(
+                    'absolute inset-0 bg-gradient-to-br transition-transform duration-700 group-hover:scale-105',
+                    GRADIENTS[i % GRADIENTS.length]
+                  )}
+                />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-matte-black/70 via-transparent to-transparent" />
               <div className="absolute inset-0 flex flex-col justify-end p-5">
                 <div className="flex items-center justify-between">

@@ -29,4 +29,5 @@ export interface CategoryNavItem {
   slug: string;
   href: string;
   featured?: boolean;
+  bannerUrl?: string;
 }

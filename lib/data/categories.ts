@@ -6,6 +6,7 @@ export type PublicCategory = {
   name: string;
   slug: string;
   order: number;
+  bannerUrl?: string;
 };
 
 /**
@@ -25,6 +26,7 @@ export async function getPublicCategories(): Promise<PublicCategory[]> {
       name: d.name,
       slug: d.slug,
       order: d.order ?? 0,
+      bannerUrl: d.bannerFileId ? `/api/images/${d.bannerFileId.toString()}` : undefined,
     }));
   } catch {
     // DB not reachable — let callers fall back to placeholder data.

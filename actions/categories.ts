@@ -42,7 +42,13 @@ export async function createCategory(
     return { success: false, error: 'A category with this name already exists.' };
   }
 
-  await Category.create({ name: parsed.data.name, slug });
+  const bannerFileId = formData.get('bannerFileId')?.toString().trim();
+
+  await Category.create({
+    name: parsed.data.name,
+    slug,
+    bannerFileId: bannerFileId || undefined,
+  });
   revalidatePath('/admin/categories');
   revalidatePath('/');
   revalidatePath('/shop');
@@ -74,7 +80,17 @@ export async function updateCategory(
     return { success: false, error: 'Another category with this name already exists.' };
   }
 
-  await Category.findByIdAndUpdate(categoryId, { name: parsed.data.name, slug });
+  // An empty string means the admin explicitly removed the image (vs. simply
+  // not touching it) — the form always sends this field, so it's safe to use
+  // "unset when blank" as the rule.
+  const bannerFileId = formData.get('bannerFileId')?.toString().trim();
+
+  await Category.findByIdAndUpdate(
+    categoryId,
+    bannerFileId
+      ? { name: parsed.data.name, slug, bannerFileId }
+      : { name: parsed.data.name, slug, $unset: { bannerFileId: '' } }
+  );
   revalidatePath('/admin/categories');
   revalidatePath('/');
   revalidatePath('/shop');

@@ -6,7 +6,16 @@ async function getCategories() {
   try {
     await connectDB();
     const docs = await CategoryModel.find().sort({ order: 1 }).lean();
-    return { categories: docs.map((d: any) => ({ ...d, _id: d._id.toString() })), connected: true };
+    return {
+      categories: docs.map((d: any) => ({
+        _id: d._id.toString(),
+        name: d.name,
+        slug: d.slug,
+        bannerFileId: d.bannerFileId ? d.bannerFileId.toString() : undefined,
+        bannerUrl: d.bannerFileId ? `/api/images/${d.bannerFileId.toString()}` : undefined,
+      })),
+      connected: true,
+    };
   } catch {
     return { categories: [], connected: false };
   }

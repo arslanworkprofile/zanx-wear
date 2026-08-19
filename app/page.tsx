@@ -8,9 +8,14 @@ import Newsletter from '@/components/home/Newsletter';
 import { FEATURED_PRODUCTS, TRENDING_PRODUCTS, NEW_ARRIVALS } from '@/lib/mock-data';
 import { getPublicCategories } from '@/lib/data/categories';
 import { getHomeSections } from '@/lib/data/products';
+import { getCommunityPosts } from '@/lib/data/community';
 
 export default async function HomePage() {
-  const [categories, homeSections] = await Promise.all([getPublicCategories(), getHomeSections()]);
+  const [categories, homeSections, communityPosts] = await Promise.all([
+    getPublicCategories(),
+    getHomeSections(),
+    getCommunityPosts(),
+  ]);
 
   // Show real, admin-created products per section; only fall back to the
   // placeholder catalog for a section that has no real products tagged yet.
@@ -48,7 +53,7 @@ export default async function HomePage() {
       />
 
       <Testimonials />
-      <InstagramFeed />
+      <InstagramFeed posts={communityPosts} />
       <Newsletter />
     </>
   );
