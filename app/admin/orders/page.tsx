@@ -99,7 +99,7 @@ export default async function AdminOrdersPage({
                     {o.payment?.provider} · {o.payment?.status}
                   </td>
                   <td className="px-5 py-4">
-                    <OrderStatusBadge status={o.status} />
+                    <OrderStatusBadge status={o.status} cancelledBy={o.cancelledBy} />
                   </td>
                   <td className="px-5 py-4 font-body text-sm text-fog">{formatPrice(o.total)}</td>
                   <td className="px-5 py-4 text-right">

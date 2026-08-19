@@ -70,7 +70,7 @@ export default async function AdminOrderDetailPage({
             })}
           </p>
         </div>
-        <OrderStatusBadge status={order.status} />
+        <OrderStatusBadge status={order.status} cancelledBy={order.cancelledBy} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">

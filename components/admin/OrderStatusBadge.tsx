@@ -21,8 +21,16 @@ const LABELS: Record<OrderStatus, string> = {
   refunded: 'Refunded',
 };
 
-export default function OrderStatusBadge({ status }: { status: string }) {
+export default function OrderStatusBadge({
+  status,
+  cancelledBy,
+}: {
+  status: string;
+  cancelledBy?: 'customer' | 'admin';
+}) {
   const key = (status as OrderStatus) in STYLES ? (status as OrderStatus) : 'pending';
+  const label =
+    key === 'cancelled' && cancelledBy === 'customer' ? 'Cancelled by customer' : LABELS[key];
   return (
     <span
       className={cn(
@@ -30,7 +38,7 @@ export default function OrderStatusBadge({ status }: { status: string }) {
         STYLES[key]
       )}
     >
-      {LABELS[key]}
+      {label}
     </span>
   );
 }

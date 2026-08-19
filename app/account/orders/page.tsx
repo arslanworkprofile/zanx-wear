@@ -70,7 +70,7 @@ export default async function OrdersPage() {
               {order.status}
             </span>
             <p className="font-body text-sm text-fog">{formatPrice(order.total)}</p>
-            <DeleteOrderButton orderId={order._id.toString()} />
+            <DeleteOrderButton orderId={order._id.toString()} status={order.status} />
           </div>
         </div>
       ))}

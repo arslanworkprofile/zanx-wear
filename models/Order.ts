@@ -53,6 +53,7 @@ export interface IOrder extends Document {
   status: OrderStatus;
   trackingNumber?: string;
   hiddenByCustomer?: boolean;
+  cancelledBy?: 'customer' | 'admin';
   createdAt: Date;
   updatedAt: Date;
 }
@@ -115,6 +116,7 @@ const OrderSchema = new Schema<IOrder>(
     },
     trackingNumber: { type: String },
     hiddenByCustomer: { type: Boolean, default: false },
+    cancelledBy: { type: String, enum: ['customer', 'admin'] },
   },
   { timestamps: true }
 );
